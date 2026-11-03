@@ -2603,3 +2603,20 @@ body.fx-drawer-open{overflow:hidden}
 @keyframes fxSplitReset{0%{transform:scaleX(1)}45%{transform:scaleX(1.5);background:var(--accent);box-shadow:0 0 18px color-mix(in srgb,var(--accent) 52%,transparent)}100%{transform:scaleX(1)}}
 @media(max-width:720px){.fx-drawer{width:100vw}.fx-drawer-content{padding:12px}.fx-drawer-content .trade-form{padding:15px}.fx-drawer-head{min-height:64px;padding:10px 14px}}
 @media(prefers-reduced-motion:reduce){.fx-collapsible-panel,.fx-collapse-button,.fx-collapse-button span,.fx-collapsible-panel>:not(.panel-head),.fx-drawer-backdrop,.fx-drawer,.fx-drawer-close{transition:none!important}}
+
+/* Dynamic header: ambient light, gliding navigation and scroll progress. */
+header.fx-dynamic-header{--fx-header-pointer:50%;--fx-header-progress:0%;isolation:isolate;transition:border-color .22s ease,box-shadow .24s ease,background-color .24s ease}
+header.fx-dynamic-header>*{position:relative;z-index:2}
+header.fx-dynamic-header::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle 210px at var(--fx-header-pointer) 50%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 72%);opacity:.72;transition:opacity .2s ease}
+header.fx-dynamic-header.is-page-scrolled{border-bottom-color:color-mix(in srgb,var(--accent) 35%,var(--line))!important;box-shadow:0 10px 28px rgba(2,8,18,.16)!important}
+header.fx-dynamic-header nav{position:relative}
+header.fx-dynamic-header nav>a::after{display:none}
+header.fx-dynamic-header nav>a:hover,header.fx-dynamic-header nav>a.active,header.fx-dynamic-header .nav-menu:hover>.nav-menu-button,header.fx-dynamic-header .nav-menu:focus-within>.nav-menu-button,header.fx-dynamic-header .nav-menu.active>.nav-menu-button{box-shadow:none!important}
+.fx-nav-indicator{--fx-nav-x:0px;--fx-nav-width:0px;position:absolute!important;left:0;bottom:-2px;z-index:5!important;width:var(--fx-nav-width);height:2px;border-radius:999px;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 35%,#fff));box-shadow:0 0 12px color-mix(in srgb,var(--accent) 72%,transparent);transform:translateX(var(--fx-nav-x));transition:width .25s var(--ease-out),transform .3s var(--ease-out),opacity .2s ease;pointer-events:none}
+.fx-nav-indicator.is-immediate{transition:none}
+.fx-header-progress{position:absolute!important;left:0;bottom:-1px;z-index:6!important;width:var(--fx-header-progress);height:1px;background:linear-gradient(90deg,transparent,var(--accent));box-shadow:0 0 8px color-mix(in srgb,var(--accent) 58%,transparent);transition:width .08s linear;pointer-events:none}
+header.fx-dynamic-header .brand .logo{transition:transform .24s var(--ease-out),border-color .22s ease,box-shadow .24s ease}
+header.fx-dynamic-header .brand:hover .logo{transform:translateY(-2px) rotate(-3deg);border-color:var(--accent);box-shadow:0 7px 20px color-mix(in srgb,var(--accent) 24%,transparent)}
+header.fx-dynamic-header .clock-dot{animation:fxHeaderStatusPulse 2.4s ease-out infinite}
+@keyframes fxHeaderStatusPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,currentColor 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media(prefers-reduced-motion:reduce){header.fx-dynamic-header,.fx-nav-indicator,.fx-header-progress,header.fx-dynamic-header .brand .logo{transition:none!important}header.fx-dynamic-header::before{display:none}.clock-dot{animation:none!important}}

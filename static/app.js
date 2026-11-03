@@ -2485,6 +2485,63 @@ document.addEventListener("DOMContentLoaded", () => {
   bindCollapsiblePanels();
   bindSlideDrawer();
 
+  const bindDynamicHeader = () => {
+    const header = document.querySelector("body > header");
+    const nav = header?.querySelector("nav");
+    if (!header || !nav || header.dataset.dynamicBound === "1") return;
+    header.dataset.dynamicBound = "1";
+    header.classList.add("fx-dynamic-header");
+    const indicator = document.createElement("span");
+    indicator.className = "fx-nav-indicator";
+    indicator.setAttribute("aria-hidden", "true");
+    nav.appendChild(indicator);
+    const progress = document.createElement("span");
+    progress.className = "fx-header-progress";
+    progress.setAttribute("aria-hidden", "true");
+    header.appendChild(progress);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let frame = 0;
+    const activeTarget = () => nav.querySelector(":scope > a.active,:scope > .nav-menu.active > .nav-menu-button") || nav.querySelector(":scope > a");
+    const moveIndicator = (target, immediate = false) => {
+      if (!target || !target.isConnected) return;
+      const navRect = nav.getBoundingClientRect();
+      const rect = target.getBoundingClientRect();
+      indicator.style.setProperty("--fx-nav-x", `${Math.round(rect.left - navRect.left)}px`);
+      indicator.style.setProperty("--fx-nav-width", `${Math.round(rect.width)}px`);
+      indicator.classList.toggle("is-immediate", immediate);
+      if (immediate) requestAnimationFrame(() => indicator.classList.remove("is-immediate"));
+    };
+    const updateScrollState = () => {
+      frame = 0;
+      const root = document.documentElement;
+      const maximum = Math.max(root.scrollHeight - window.innerHeight, 1);
+      const ratio = Math.max(0, Math.min(window.scrollY / maximum, 1));
+      header.style.setProperty("--fx-header-progress", `${(ratio * 100).toFixed(2)}%`);
+      header.classList.toggle("is-page-scrolled", window.scrollY > 10);
+    };
+    const requestScrollUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(updateScrollState);
+    };
+    nav.addEventListener("pointerover", (event) => {
+      const target = event.target.closest("nav > a,nav > button,nav > .nav-menu > .nav-menu-button");
+      if (target && nav.contains(target)) moveIndicator(target);
+    });
+    nav.addEventListener("pointerleave", () => moveIndicator(activeTarget()));
+    header.addEventListener("pointermove", (event) => {
+      if (reducedMotion || event.pointerType === "touch") return;
+      const rect = header.getBoundingClientRect();
+      header.style.setProperty("--fx-header-pointer", `${((event.clientX - rect.left) / Math.max(rect.width, 1) * 100).toFixed(1)}%`);
+    });
+    header.addEventListener("pointerleave", () => header.style.removeProperty("--fx-header-pointer"));
+    window.addEventListener("scroll", requestScrollUpdate, { passive: true });
+    window.addEventListener("resize", () => moveIndicator(activeTarget(), true));
+    document.addEventListener("option-ledger:navigation-updated", () => moveIndicator(activeTarget()));
+    requestAnimationFrame(() => moveIndicator(activeTarget(), true));
+    updateScrollState();
+  };
+
+  bindDynamicHeader();
+
   const bindPolishEffects = () => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -3666,6 +3723,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentNav.querySelectorAll(".nav-menu").forEach((menu, index) => {
       menu.classList.toggle("active", Boolean(nextMenus[index]?.classList.contains("active")));
     });
+    document.dispatchEvent(new CustomEvent("option-ledger:navigation-updated"));
   };
 
   let softNavigationRequest = null;
