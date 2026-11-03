@@ -2528,15 +2528,33 @@ body[data-theme="dark"] footer{background:#070d18!important;color:#657a9a!import
 @keyframes dashboardNodeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes fxLineDraw{to{stroke-dashoffset:0}}
 
-@media(min-width:981px){
-  body:has(.dashboard-motion-hero) .webull-dashboard-layout{height:calc(100vh - 360px)!important;max-height:calc(100vh - 360px)!important}
-}
+.brand{color:inherit}
+.site-cover{width:min(1240px,100%)}
+body:has(.site-cover){overflow:hidden}
+body:has(.site-cover) main{display:grid;place-items:center;max-width:none;min-height:calc(100vh - 128px);padding:28px}
+body:has(.site-cover) footer{position:fixed;right:0;bottom:0;left:0;height:24px;padding:4px 0!important;background:var(--bg);z-index:4}
+.site-cover .dashboard-motion-hero{min-height:clamp(430px,66vh,680px);margin:0;padding:clamp(34px,5vw,70px);grid-template-columns:minmax(0,1.35fr) minmax(360px,.65fr)}
+.site-cover .dashboard-motion-hero h1{font-size:clamp(44px,5vw,72px)}
+.site-cover .dashboard-hero-type-line{margin-top:16px;font-size:19px}
+.site-cover .dashboard-hero-chips{margin-top:22px}
+.site-cover .dashboard-hero-actions{margin-top:24px}
+.site-cover .dashboard-motion-hero .button{min-height:42px;padding:10px 18px}
+.site-cover .dashboard-hero-visual{width:340px;height:250px}
+.site-cover .dashboard-hero-orbit.orbit-one{width:300px;height:170px}
+.site-cover .dashboard-hero-orbit.orbit-two{width:205px;height:205px}
+.site-cover .dashboard-hero-core{width:112px;height:112px}
+.site-cover .dashboard-hero-core small{top:24px}.site-cover .dashboard-hero-core span{bottom:23px}.site-cover .dashboard-hero-core b{font-size:36px}
 @media(max-width:900px){
   .dashboard-motion-hero{grid-template-columns:1fr;min-height:0;padding:24px}
   .dashboard-hero-visual{position:absolute;right:-48px;top:8px;opacity:.34!important;transform:scale(.82)!important}
   .dashboard-hero-copy{max-width:680px}
 }
 @media(max-width:620px){
+  body:has(.site-cover){overflow:auto}
+  body:has(.site-cover) main{min-height:calc(100vh - 112px);padding:14px}
+  .site-cover .dashboard-motion-hero{min-height:calc(100vh - 150px);padding:28px 20px;grid-template-columns:1fr}
+  .site-cover .dashboard-motion-hero h1{font-size:38px}
+  .site-cover .dashboard-hero-type-line{font-size:15px}
   .dashboard-motion-hero{margin-bottom:14px;padding:21px 18px;border-radius:12px}
   .dashboard-motion-hero h1{font-size:30px}
   .dashboard-hero-type-line{display:block;min-height:46px;font-size:14px}

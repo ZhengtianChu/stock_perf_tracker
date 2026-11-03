@@ -653,6 +653,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "Bilingual workflow": "中英双语工作流",
     "Fast local analytics": "快速本地分析",
     "View portfolio": "查看组合",
+    "Enter dashboard": "进入仪表盘",
     "Trades / Contracts": "交易 / 合约",
     "Best / Worst": "最佳 / 最差",
     "Avg Win P/L / %": "平均盈利 / 收益率",

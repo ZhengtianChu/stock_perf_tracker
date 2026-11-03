@@ -4706,7 +4706,7 @@ def layout(title: str, body: str, active: str = "") -> bytes:
     <link rel="stylesheet" href="/static/style.css?v=20261031-9"></head><body><script>
     (function(){{try{{var m=localStorage.getItem("optionLedgerTheme")||"auto";var r=m==="auto"?"light":m;document.body.dataset.themeMode=m;document.body.dataset.theme=r;document.documentElement.dataset.theme=r;}}catch(e){{document.body.dataset.theme="light";document.documentElement.dataset.theme="light";}}}})();
     </script>
-    <header><div class="brand"><span class="logo"><img src="/static/dandan-avatar.png" alt=""></span><div><b>dandan.com</b><small>Trading Dashboard</small></div></div><nav>{nav}</nav></header>
+    <header><a class="brand" href="/welcome" aria-label="Open welcome page"><span class="logo"><img src="/static/dandan-avatar.png" alt=""></span><span><b>dandan.com</b><small>Trading Dashboard</small></span></a><nav>{nav}</nav></header>
     <div class="ticker-tape" data-ticker-tape data-refresh-seconds="{MARKET_TAPE_REFRESH_SECONDS}"><div class="ticker-track"><span class="ticker-item muted"><b>Loading</b><span>Market prices</span></span></div></div>
     {command_palette()}<main>{body}</main><footer>Local data | Your SQLite file stays on this computer</footer>
     <div class="ragdoll-companion" data-ragdoll-companion>
@@ -7938,6 +7938,32 @@ def day_trade_dashboard_page(query=None) -> bytes:
     )
 
 
+def welcome_page(query=None) -> bytes:
+    body = '''<div class="site-cover">
+      <section class="dashboard-motion-hero" data-dashboard-hero>
+        <div class="dashboard-hero-glow" aria-hidden="true"></div>
+        <div class="dashboard-hero-copy">
+          <p class="dashboard-hero-kicker"><i aria-hidden="true"></i><span>Local-first trading intelligence</span></p>
+          <h1>Trading Dashboard</h1>
+          <p class="dashboard-hero-type-line"><span>Built for</span> <strong data-dashboard-typing>stocks, options, and portfolios</strong><i aria-hidden="true"></i></p>
+          <div class="dashboard-hero-chips">
+            <span>Private by default</span><span>Bilingual workflow</span><span>Fast local analytics</span>
+          </div>
+          <div class="dashboard-hero-actions"><a class="button" href="/">Enter dashboard</a><a class="button secondary" href="/brokerage">View portfolio</a></div>
+        </div>
+        <div class="dashboard-hero-visual" aria-hidden="true">
+          <div class="dashboard-hero-orbit orbit-one"></div>
+          <div class="dashboard-hero-orbit orbit-two"></div>
+          <div class="dashboard-hero-core"><small>LOCAL</small><b>&infin;</b><span>YOUR DATA</span></div>
+          <div class="dashboard-hero-node node-stocks">STOCKS</div>
+          <div class="dashboard-hero-node node-options">OPTIONS</div>
+          <div class="dashboard-hero-node node-portfolio">PORTFOLIO</div>
+        </div>
+      </section>
+    </div>'''
+    return layout("Welcome - Option Ledger", body)
+
+
 def dashboard_page(query=None) -> bytes:
     query = query or {}
     if query.get("dashboard", [""])[0] == "option-buyer":
@@ -8006,27 +8032,7 @@ def dashboard_page(query=None) -> bytes:
       {summary_html}
     </section>'''
 
-    body = f'''<section class="dashboard-motion-hero" data-dashboard-hero>
-      <div class="dashboard-hero-glow" aria-hidden="true"></div>
-      <div class="dashboard-hero-copy">
-        <p class="dashboard-hero-kicker"><i aria-hidden="true"></i><span>Local-first trading intelligence</span></p>
-        <h1>Trading Dashboard</h1>
-        <p class="dashboard-hero-type-line"><span>Built for</span> <strong data-dashboard-typing>stocks, options, and portfolios</strong><i aria-hidden="true"></i></p>
-        <div class="dashboard-hero-chips">
-          <span>Private by default</span><span>Bilingual workflow</span><span>Fast local analytics</span>
-        </div>
-        <div class="dashboard-hero-actions"><a class="button" href="/option-trade/new?book=buyer">Record trade</a><a class="button secondary" href="/brokerage">View portfolio</a></div>
-      </div>
-      <div class="dashboard-hero-visual" aria-hidden="true">
-        <div class="dashboard-hero-orbit orbit-one"></div>
-        <div class="dashboard-hero-orbit orbit-two"></div>
-        <div class="dashboard-hero-core"><small>LOCAL</small><b>∞</b><span>YOUR DATA</span></div>
-        <div class="dashboard-hero-node node-stocks">STOCKS</div>
-        <div class="dashboard-hero-node node-options">OPTIONS</div>
-        <div class="dashboard-hero-node node-portfolio">PORTFOLIO</div>
-      </div>
-    </section>
-    {dashboard_filter_panel(query, brokers, books, range_controls)}
+    body = f'''{dashboard_filter_panel(query, brokers, books, range_controls)}
     <div class="overview-dashboard-layout webull-dashboard-layout" data-dashboard-layout>
       <div class="overview-dashboard-column overview-dashboard-left webull-dashboard-side">
         {card_html}
@@ -12039,6 +12045,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/portfolio-deposit/new": return self.send_bytes(portfolio_deposit_form())
         if path == "/options-calculator": return self.send_bytes(option_calculator_page(query))
         if path in {"/account", "/login"}: return self.send_bytes(account_page())
+        if path == "/welcome": return self.send_bytes(welcome_page(query))
         if path == "/": return self.send_bytes(dashboard_page(query))
         if path == "/symbols": return self.send_bytes(symbols_page(query))
         if path == "/analytics": return self.redirect("/")
