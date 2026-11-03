@@ -8006,7 +8006,26 @@ def dashboard_page(query=None) -> bytes:
       {summary_html}
     </section>'''
 
-    body = f'''<div class="page-head"><div><p class="eyebrow">Performance overview</p><h1>Trading Dashboard</h1></div><a class="button" href="/option-trade/new?book=buyer">Record trade</a></div>
+    body = f'''<section class="dashboard-motion-hero" data-dashboard-hero>
+      <div class="dashboard-hero-glow" aria-hidden="true"></div>
+      <div class="dashboard-hero-copy">
+        <p class="dashboard-hero-kicker"><i aria-hidden="true"></i><span>Local-first trading intelligence</span></p>
+        <h1>Trading Dashboard</h1>
+        <p class="dashboard-hero-type-line"><span>Built for</span> <strong data-dashboard-typing>stocks, options, and portfolios</strong><i aria-hidden="true"></i></p>
+        <div class="dashboard-hero-chips">
+          <span>Private by default</span><span>Bilingual workflow</span><span>Fast local analytics</span>
+        </div>
+        <div class="dashboard-hero-actions"><a class="button" href="/option-trade/new?book=buyer">Record trade</a><a class="button secondary" href="/brokerage">View portfolio</a></div>
+      </div>
+      <div class="dashboard-hero-visual" aria-hidden="true">
+        <div class="dashboard-hero-orbit orbit-one"></div>
+        <div class="dashboard-hero-orbit orbit-two"></div>
+        <div class="dashboard-hero-core"><small>LOCAL</small><b>∞</b><span>YOUR DATA</span></div>
+        <div class="dashboard-hero-node node-stocks">STOCKS</div>
+        <div class="dashboard-hero-node node-options">OPTIONS</div>
+        <div class="dashboard-hero-node node-portfolio">PORTFOLIO</div>
+      </div>
+    </section>
     {dashboard_filter_panel(query, brokers, books, range_controls)}
     <div class="overview-dashboard-layout webull-dashboard-layout" data-dashboard-layout>
       <div class="overview-dashboard-column overview-dashboard-left webull-dashboard-side">

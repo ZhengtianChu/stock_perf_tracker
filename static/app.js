@@ -647,6 +647,12 @@ document.addEventListener("DOMContentLoaded", () => {
     "Deposit": "入金",
     "Withdrawal": "出金",
     "Trading Dashboard": "交易仪表盘",
+    "Local-first trading intelligence": "本地优先的交易智能",
+    "Built for": "专为",
+    "Private by default": "默认保护隐私",
+    "Bilingual workflow": "中英双语工作流",
+    "Fast local analytics": "快速本地分析",
+    "View portfolio": "查看组合",
     "Trades / Contracts": "交易 / 合约",
     "Best / Worst": "最佳 / 最差",
     "Avg Win P/L / %": "平均盈利 / 收益率",
@@ -2314,11 +2320,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  const bindDashboardHero = (root = document) => {
+    const hero = root.matches?.("[data-dashboard-hero]") ? root : root.querySelector?.("[data-dashboard-hero]");
+    if (!hero || hero.dataset.heroBound === "1") return;
+    hero.dataset.heroBound = "1";
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const typing = hero.querySelector("[data-dashboard-typing]");
+    const phrases = activeLanguage === "zh"
+      ? ["股票、期权与投资组合", "复盘、学习与持续进步", "数据始终留在你的电脑", "更清晰、更自律的交易"]
+      : ["stocks, options, and portfolios", "review, learning, and iteration", "data that stays on your computer", "clearer, more disciplined trading"];
+
+    hero.classList.add("is-ready");
+    if (typing) {
+      typing.setAttribute("aria-live", "polite");
+      if (reducedMotion) {
+        typing.textContent = phrases[0];
+      } else {
+        let phraseIndex = 0;
+        let characterIndex = 0;
+        let deleting = false;
+        const typeNext = () => {
+          const phrase = phrases[phraseIndex];
+          characterIndex += deleting ? -1 : 1;
+          typing.textContent = phrase.slice(0, Math.max(0, characterIndex));
+          let delay = deleting ? 28 : 54;
+          if (!deleting && characterIndex >= phrase.length) {
+            deleting = true;
+            delay = 1450;
+          } else if (deleting && characterIndex <= 0) {
+            deleting = false;
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            delay = 320;
+          }
+          window.setTimeout(typeNext, delay);
+        };
+        typing.textContent = "";
+        window.setTimeout(typeNext, 280);
+      }
+    }
+
+    if (!reducedMotion) {
+      hero.addEventListener("pointermove", (event) => {
+        if (event.pointerType === "touch") return;
+        const rect = hero.getBoundingClientRect();
+        hero.style.setProperty("--hero-pointer-x", `${((event.clientX - rect.left) / Math.max(rect.width, 1) * 100).toFixed(1)}%`);
+        hero.style.setProperty("--hero-pointer-y", `${((event.clientY - rect.top) / Math.max(rect.height, 1) * 100).toFixed(1)}%`);
+      });
+      hero.addEventListener("pointerleave", () => {
+        hero.style.removeProperty("--hero-pointer-x");
+        hero.style.removeProperty("--hero-pointer-y");
+      });
+    }
+  };
+  bindDashboardHero();
+
   const bindPolishEffects = () => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (!reducedMotion) {
       const revealNodes = document.querySelectorAll([
+        "main > .dashboard-motion-hero",
         "main > .page-head",
         "main > .metrics",
         "main > .panel",
@@ -2345,8 +2406,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!reducedMotion) {
       numberNodes.forEach((node) => {
         if (node.childElementCount) return;
-        if (!(node.textContent || "").trim().match(numberPattern)) return;
+        if (node.dataset.fxCountBound === "1") return;
+        const match = (node.textContent || "").trim().match(numberPattern);
+        if (!match) return;
+        node.dataset.fxCountBound = "1";
         node.classList.add("fx-number-pop");
+        const [, sign, currency, numericText, suffix] = match;
+        const target = Number(numericText.replaceAll(",", ""));
+        if (!Number.isFinite(target)) return;
+        const decimals = numericText.includes(".") ? numericText.split(".")[1].length : 0;
+        const original = node.textContent.trim();
+        node.setAttribute("aria-label", original);
+        const startedAt = performance.now();
+        const duration = 680;
+        const render = (now) => {
+          const progress = Math.min((now - startedAt) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const value = target * eased;
+          node.textContent = `${sign}${currency}${value.toLocaleString("en-US", {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+          })}${suffix || ""}`;
+          if (progress < 1) requestAnimationFrame(render);
+          else node.textContent = original;
+        };
+        requestAnimationFrame(render);
       });
     }
 
@@ -2376,6 +2460,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!reducedMotion) {
       document.querySelectorAll(".performance-chart,.capital-chart,[data-portfolio-chart]").forEach((chart) => chart.classList.add("fx-chart-reveal"));
       document.querySelectorAll(".perf-area,.capital-area,.portfolio-area").forEach((area) => area.classList.add("fx-area-reveal"));
+      document.querySelectorAll(".perf-line,.capital-line,.portfolio-line").forEach((line) => {
+        line.setAttribute("pathLength", "1");
+        line.classList.add("fx-line-draw");
+      });
     }
 
     const pendingToast = sessionStorage.getItem("optionLedgerToast");
@@ -3427,6 +3515,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bindSymbolsSplitter();
     bindLedgerSplitters();
     bindOptionPositionGroups();
+    bindDashboardHero(root);
     bindPolishEffects();
     loadEarningsReminder();
   };
