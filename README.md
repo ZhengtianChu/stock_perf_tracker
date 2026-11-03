@@ -1,5 +1,13 @@
 # Trading Dashboard / 交易仪表盘
 
+<p align="center">
+  <a href="#中文指南">中文指南</a> ·
+  <a href="#english-guide">English Guide</a> ·
+  <a href="https://github.com/ZhengtianChu/stock_perf_tracker/releases/latest">Latest Release</a>
+</p>
+
+## 中文指南
+
 一个本地运行、无需安装第三方 Python 包的交易记录与组合仪表盘。支持股票、期权卖方、期权买方、日内交易、复盘、标的详情、组合曲线和中英文界面。
 
 > 数据默认只保存在你的电脑上。项目没有登录系统，请不要直接暴露到公网。
@@ -165,6 +173,170 @@ start_background.bat
 - 提交代码前运行 `git status`，确认没有数据库、快照、导出文件或密钥被暂存。
 
 ## 测试
+
+```bash
+python -m unittest tests.test_app
+```
+
+---
+
+## English Guide
+
+A local-first trading journal and portfolio dashboard with no third-party Python dependencies. It supports stock trades, option-selling and option-buying strategies, day trades, reviews, symbol research, portfolio analytics, and both English and Chinese interfaces.
+
+> Your data stays on your computer by default. The app has no authentication layer, so do not expose it directly to the public internet.
+
+### Features
+
+- Create, edit, search, and filter stock and option trades
+- Track Sell Puts, Covered Calls, Credit Spreads, Iron Condors, and long options
+- Calculate realized and unrealized P&L, win rate, ROC, annualized return, and risk metrics
+- Review portfolio value, account allocation, holdings, and historical returns
+- Explore symbol-level trade history, earnings markers, valuation scenarios, and weekly reviews
+- Switch between English and Chinese
+- Export data to CSV and store everything in a local SQLite database
+- Run on Windows, macOS, and Linux
+
+### Requirements
+
+- Python 3.10 or newer
+- Git, if you clone the repository
+- No `pip install` required
+
+Check your Python version:
+
+```bash
+python --version
+```
+
+On macOS or Linux, the command may be `python3`.
+
+### Local installation
+
+#### 1. Download the project
+
+```bash
+git clone https://github.com/ZhengtianChu/stock_perf_tracker.git
+cd stock_perf_tracker
+```
+
+Alternatively, download and extract the source archive from the [latest GitHub Release](https://github.com/ZhengtianChu/stock_perf_tracker/releases/latest).
+
+#### 2. Start the app
+
+Windows:
+
+```powershell
+python start.py
+```
+
+You can also double-click `start_windows.bat`.
+
+macOS or Linux:
+
+```bash
+python3 start.py
+```
+
+On macOS, you can also use:
+
+```bash
+chmod +x start_mac.command
+./start_mac.command
+```
+
+#### 3. Open the dashboard
+
+Visit:
+
+```text
+http://127.0.0.1:8000
+```
+
+Press `Ctrl+C` to stop the server. On first launch, the app creates an empty database at `data/trades.db`.
+
+### Updating
+
+From the project directory:
+
+```bash
+git pull
+```
+
+Code updates do not remove files under `data/`. Back up `data/trades.db` before major upgrades.
+
+### Data and privacy
+
+The following local files are excluded from Git by default:
+
+- Databases, account snapshots, caches, portfolio history, and local keys under `data/`
+- `.env` and `.env.*`
+- Local sync results and personal reconciliation scripts
+- `bootstrap_trades.json`
+
+Your primary backup is:
+
+```text
+data/trades.db
+```
+
+For a complete backup, copy the entire `data/` directory to a secure location. Never commit brokerage exports, account snapshots, databases, or API credentials to a public repository.
+
+### Optional configuration
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `OPTIONS_TRACKER_HOST` | `127.0.0.1` | Local bind address |
+| `OPTIONS_TRACKER_PORT` | `8000` | Web server port |
+| `OPTIONS_TRACKER_RELOAD` | `1` | Automatic development reload; set to `0` to disable |
+| `OPTIONS_TRACKER_AUTO_REFRESH_PRICES` | `1` | Daily holding-price refresh |
+| `OPTIONS_TRACKER_PRICE_REFRESH_TIME` | `00:00` | Local refresh time |
+| `OPTIONS_TRACKER_LOCAL_TIMEZONE` | `America/Los_Angeles` | Local timezone |
+| `FINNHUB_API_KEY` | empty | Optional market data |
+| `PLAID_CLIENT_ID` | empty | Optional Plaid connection |
+| `PLAID_SECRET` | empty | Optional Plaid connection |
+| `PLAID_ENV` | `sandbox` | Plaid environment |
+
+Secrets can be supplied through environment variables or local files under `data/`, such as:
+
+```text
+data/.finnhub_api_key
+data/.plaid_client_id
+data/.plaid_secret
+```
+
+These files are ignored by Git.
+
+#### Optional portfolio history
+
+Create `data/portfolio_config.json` to supply a custom deposit basis and historical portfolio values:
+
+```json
+{
+  "deposit_basis": 10000,
+  "manual_equity_points": [
+    {"date": "2025-01-01", "value": 10000},
+    {"date": "2025-06-30", "value": 11250}
+  ],
+  "taxable_ledger_file": "external_taxable_ledger.json",
+  "retirement_ledger_file": "external_retirement_ledger.json"
+}
+```
+
+Keep this file and any account ledgers inside `data/` so they remain private.
+
+### Background startup on Windows
+
+Run `start_background.bat`, or inspect and use the included startup-task installation script for your local folder.
+
+### Security notes
+
+- Keep the default `127.0.0.1` bind address for personal use.
+- The app does not include authentication; do not forward its port to the internet.
+- Add authentication, HTTPS, access controls, and secure backups before any shared or cloud deployment.
+- Run `git status` before committing and verify that no database, snapshot, export, or credential is staged.
+
+### Tests
 
 ```bash
 python -m unittest tests.test_app
