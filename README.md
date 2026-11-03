@@ -172,4 +172,4 @@ python -m unittest tests.test_app
 
 ## License
 
-当前仓库未附加开源许可证。作者保留所有权利；如需公开分发或二次开发，请先联系仓库所有者。
+本项目采用 [MIT License](LICENSE)。你可以自由使用、修改和分发，但需保留原始版权与许可证声明。
