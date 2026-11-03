@@ -4465,10 +4465,10 @@ def layout(title: str, body: str, active: str = "") -> bytes:
     )
     html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1"><title>{escape(title)}</title>
-    <link rel="stylesheet" href="/static/style.css?v=20261031-9"></head><body>
+    <link rel="stylesheet" href="/static/style.css?v=20261102-1"></head><body>
     <header><div class="brand"><span class="logo">OL</span><div><b>Option Ledger</b><small>Trading Dashboard</small></div></div><nav>{nav}<select class="currency-picker" aria-label="Choose currency">{currency_options}</select><button class="theme-toggle" type="button" aria-label="Toggle color theme" title="Theme: Auto"><span class="theme-toggle-icon" aria-hidden="true">&#9728;</span></button><select class="font-picker" aria-label="Choose site font">{font_options}</select></nav></header>
     {command_palette()}<main>{body}</main><footer>Local data | Your SQLite file stays on this computer</footer>
-    <script src="/static/app.js?v=20261031-9"></script></body></html>"""
+    <script src="/static/app.js?v=20261102-1"></script></body></html>"""
     return html.encode("utf-8")
 
 
@@ -4581,10 +4581,10 @@ def layout(title: str, body: str, active: str = "") -> bytes:
     )
     html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1"><title>{escape(title)}</title>
-    <link rel="stylesheet" href="/static/style.css?v=20261031-9"></head><body>
+    <link rel="stylesheet" href="/static/style.css?v=20261102-1"></head><body>
     <header><div class="brand"><span class="logo">OL</span><div><b>Option Ledger</b><small>Trading Dashboard</small></div></div><nav>{nav}</nav></header>
     {command_palette()}<main>{body}</main><footer>Local data | Your SQLite file stays on this computer</footer>
-    <script src="/static/app.js?v=20261031-9"></script></body></html>"""
+    <script src="/static/app.js?v=20261102-1"></script></body></html>"""
     return html.encode("utf-8")
 
 
@@ -4703,7 +4703,7 @@ def layout(title: str, body: str, active: str = "") -> bytes:
     <meta name="viewport" content="width=device-width,initial-scale=1"><title>{escape(page_title)}</title>
     <link rel="icon" type="image/png" href="/static/dandan-avatar.png">
     <style>html{{background:#eeede6}}</style>
-    <link rel="stylesheet" href="/static/style.css?v=20261031-9"></head><body><script>
+    <link rel="stylesheet" href="/static/style.css?v=20261102-1"></head><body><script>
     (function(){{try{{var m=localStorage.getItem("optionLedgerTheme")||"auto";var r=m==="auto"?"light":m;document.body.dataset.themeMode=m;document.body.dataset.theme=r;document.documentElement.dataset.theme=r;}}catch(e){{document.body.dataset.theme="light";document.documentElement.dataset.theme="light";}}}})();
     </script>
     <header><a class="brand" href="/welcome" aria-label="Open welcome page"><span class="logo"><img src="/static/dandan-avatar.png" alt=""></span><span><b>dandan.com</b><small>Trading Dashboard</small></span></a><nav>{nav}</nav></header>
@@ -4732,7 +4732,7 @@ def layout(title: str, body: str, active: str = "") -> bytes:
         <img src="/static/dandan-avatar.png" alt="" aria-hidden="true" draggable="false">
       </button>
     </div>
-    <script src="/static/app.js?v=20261031-9"></script></body></html>"""
+    <script src="/static/app.js?v=20261102-1"></script></body></html>"""
     return html.encode("utf-8")
 
 
