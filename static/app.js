@@ -654,6 +654,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "Fast local analytics": "快速本地分析",
     "View portfolio": "查看组合",
     "Enter dashboard": "进入仪表盘",
+    "Edit details": "编辑详情",
+    "Loading details...": "正在加载详情...",
     "Trades / Contracts": "交易 / 合约",
     "Best / Worst": "最佳 / 最差",
     "Avg Win P/L / %": "平均盈利 / 收益率",
@@ -2375,6 +2377,114 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   bindDashboardHero();
 
+  const bindCollapsiblePanels = (root = document) => {
+    const panels = root.querySelectorAll?.(".panel:not(.trade-form):not([data-no-collapse])") || [];
+    panels.forEach((panel, index) => {
+      if (panel.dataset.collapseBound === "1") return;
+      if (panel.closest(".webull-dashboard-grid,.webull-dashboard-side")) return;
+      const head = panel.querySelector(":scope > .panel-head");
+      if (!head || panel.children.length < 2) return;
+      panel.dataset.collapseBound = "1";
+      panel.classList.add("fx-collapsible-panel");
+      const heading = head.querySelector("h1,h2,h3,b,strong")?.textContent?.trim() || `section-${index}`;
+      const storageKey = `optionLedgerPanel:${location.pathname}:${heading}`;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "fx-collapse-button";
+      button.innerHTML = '<span aria-hidden="true"></span>';
+      head.appendChild(button);
+      const setCollapsed = (collapsed, animate = true) => {
+        button.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        button.setAttribute("aria-label", collapsed ? "Expand section" : "Collapse section");
+        button.title = collapsed ? "Expand section" : "Collapse section";
+        if (!animate) panel.style.transition = "none";
+        if (collapsed) {
+          panel.style.maxHeight = `${Math.ceil(head.getBoundingClientRect().height + 34)}px`;
+          panel.classList.add("fx-panel-collapsed");
+        } else {
+          panel.classList.remove("fx-panel-collapsed");
+          panel.style.maxHeight = `${panel.scrollHeight}px`;
+          window.setTimeout(() => {
+            if (!panel.classList.contains("fx-panel-collapsed")) panel.style.removeProperty("max-height");
+          }, 340);
+        }
+        if (!animate) requestAnimationFrame(() => panel.style.removeProperty("transition"));
+      };
+      setCollapsed(localStorage.getItem(storageKey) === "collapsed", false);
+      button.addEventListener("click", () => {
+        const collapsed = !panel.classList.contains("fx-panel-collapsed");
+        setCollapsed(collapsed);
+        if (collapsed) localStorage.setItem(storageKey, "collapsed");
+        else localStorage.removeItem(storageKey);
+      });
+    });
+  };
+
+  const bindSlideDrawer = () => {
+    if (document.documentElement.dataset.drawerBound === "1") return;
+    document.documentElement.dataset.drawerBound = "1";
+    const shell = document.createElement("div");
+    shell.className = "fx-drawer-shell";
+    shell.hidden = true;
+    shell.innerHTML = `<button class="fx-drawer-backdrop" type="button" aria-label="Close details"></button>
+      <aside class="fx-drawer" role="dialog" aria-modal="true" aria-labelledby="fx-drawer-title">
+        <div class="fx-drawer-head"><div><small>QUICK EDIT</small><h2 id="fx-drawer-title">Edit details</h2></div><button class="fx-drawer-close" type="button" aria-label="Close details">&times;</button></div>
+        <div class="fx-drawer-content"></div>
+      </aside>`;
+    document.body.appendChild(shell);
+    const content = shell.querySelector(".fx-drawer-content");
+    const closeButton = shell.querySelector(".fx-drawer-close");
+    let request = null;
+    const close = () => {
+      request?.abort();
+      shell.classList.remove("is-open");
+      document.body.classList.remove("fx-drawer-open");
+      window.setTimeout(() => { shell.hidden = true; content.replaceChildren(); }, 280);
+    };
+    const open = async (url) => {
+      request?.abort();
+      request = new AbortController();
+      shell.hidden = false;
+      content.innerHTML = '<div class="fx-drawer-loading"><i></i><span>Loading details...</span></div>';
+      applyLanguage(shell);
+      requestAnimationFrame(() => shell.classList.add("is-open"));
+      document.body.classList.add("fx-drawer-open");
+      closeButton.focus({ preventScroll: true });
+      try {
+        const destination = new URL(url, location.href);
+        if (activeLanguage === "zh") destination.searchParams.set("lang", "zh");
+        const response = await fetch(destination, { cache: "no-store", signal: request.signal });
+        if (!response.ok) throw new Error(`Drawer request failed: ${response.status}`);
+        const page = new DOMParser().parseFromString(await response.text(), "text/html");
+        const nextMain = page.querySelector("main");
+        if (!nextMain) throw new Error("Missing form content");
+        const imported = document.importNode(nextMain, true);
+        content.replaceChildren(...Array.from(imported.childNodes));
+        hydrateSoftPage(content);
+        content.querySelector("input:not([type=hidden]),select,textarea")?.focus({ preventScroll: true });
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        location.assign(url);
+      }
+    };
+    shell.querySelector(".fx-drawer-backdrop").addEventListener("click", close);
+    closeButton.addEventListener("click", close);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && shell.classList.contains("is-open")) close();
+    });
+    document.addEventListener("click", (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target.closest("main a[href]");
+      if (!link || !/\/(?:trade|day-trade|other-option|earnings-bet|stock-trade)\/\d+\/edit(?:\?|$)/.test(link.getAttribute("href") || "")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      open(link.href);
+    });
+  };
+
+  bindCollapsiblePanels();
+  bindSlideDrawer();
+
   const bindPolishEffects = () => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -2901,6 +3011,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (Number.isFinite(savedWidth) && savedWidth > 0) {
       layout.style.setProperty("--dashboard-side-width", `${Math.max(420, savedWidth)}px`);
     }
+    splitter.addEventListener("dblclick", () => {
+      layout.style.removeProperty("--dashboard-side-width");
+      window.localStorage.removeItem(storageKey);
+      splitter.classList.add("fx-split-reset");
+      window.setTimeout(() => splitter.classList.remove("fx-split-reset"), 420);
+      window.dispatchEvent(new Event("resize"));
+    });
     splitter.addEventListener("pointerdown", (event) => {
       if (window.matchMedia("(max-width: 980px)").matches) return;
       event.preventDefault();
@@ -2940,6 +3057,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (Number.isFinite(savedWidth) && savedWidth > 0) {
       layout.style.setProperty("--symbols-sidebar-width", `${Math.max(250, savedWidth)}px`);
     }
+    splitter.addEventListener("dblclick", () => {
+      layout.style.removeProperty("--symbols-sidebar-width");
+      window.localStorage.removeItem(storageKey);
+      splitter.classList.add("fx-split-reset");
+      window.setTimeout(() => splitter.classList.remove("fx-split-reset"), 420);
+      window.dispatchEvent(new Event("resize"));
+    });
     splitter.addEventListener("pointerdown", (event) => {
       if (window.matchMedia("(max-width: 980px)").matches) return;
       event.preventDefault();
@@ -2978,6 +3102,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (Number.isFinite(savedWidth) && savedWidth > 0) {
         layout.style.setProperty("--ledger-sidebar-width", `${Math.max(250, savedWidth)}px`);
       }
+      splitter.addEventListener("dblclick", () => {
+        layout.style.removeProperty("--ledger-sidebar-width");
+        window.localStorage.removeItem(storageKey);
+        splitter.classList.add("fx-split-reset");
+        window.setTimeout(() => splitter.classList.remove("fx-split-reset"), 420);
+        window.dispatchEvent(new Event("resize"));
+      });
       splitter.addEventListener("pointerdown", (event) => {
         if (window.matchMedia("(max-width: 980px)").matches) return;
         event.preventDefault();
@@ -3517,6 +3648,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bindLedgerSplitters();
     bindOptionPositionGroups();
     bindDashboardHero(root);
+    bindCollapsiblePanels(root);
     bindPolishEffects();
     loadEarningsReminder();
   };
