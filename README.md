@@ -1,10 +1,23 @@
+<div align="center">
+
+![Trading Dashboard](https://capsule-render.vercel.app/api?type=waving&height=230&color=0:6C63FF,50:00BFA6,100:0D1117&text=Trading%20Dashboard&fontColor=ffffff&fontSize=46&fontAlignY=38&desc=Privacy-first%20%C2%B7%20Local-first%20%C2%B7%20Built%20for%20traders&descAlignY=58&animation=fadeIn)
+
 # Trading Dashboard / 交易仪表盘
 
-<p align="center">
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=21&duration=2700&pause=850&color=38D9A9&center=true&vCenter=true&width=820&lines=Stocks+%C2%B7+Options+%C2%B7+Portfolio+analytics;Privacy-first+trading+journal;Runs+locally+%C2%B7+Your+data+stays+yours;English+%C2%B7+%E4%B8%AD%E6%96%87)](https://git.io/typing-svg)
+
+[![Latest Release](https://img.shields.io/github/v/release/ZhengtianChu/stock_perf_tracker?style=for-the-badge&color=00BFA6&label=release)](https://github.com/ZhengtianChu/stock_perf_tracker/releases/latest)
+[![MIT License](https://img.shields.io/github/license/ZhengtianChu/stock_perf_tracker?style=for-the-badge&color=6C63FF)](LICENSE)
+![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Local First](https://img.shields.io/badge/Local--first-Your_data_stays_local-0D1117?style=for-the-badge&logo=sqlite&logoColor=38D9A9)
+
+<p>
   <a href="#中文指南">中文指南</a> ·
   <a href="#english-guide">English Guide</a> ·
   <a href="https://github.com/ZhengtianChu/stock_perf_tracker/releases/latest">Latest Release</a>
 </p>
+
+</div>
 
 ## 中文指南
 
